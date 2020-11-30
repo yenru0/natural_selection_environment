@@ -11,9 +11,8 @@ from function.gui import MainWindow
 
 if __name__ == '__main__':
     pygame.init()
-    surf = pygame.Surface((640,480))
+    surf = pygame.Surface((640, 480))
     app = QApplication(sys.argv)
     w = MainWindow(surf)
-    #w.setFixedSize(650, 490)
     w.show()
     app.exec_()
