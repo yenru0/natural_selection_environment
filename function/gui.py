@@ -8,6 +8,8 @@ import numpy as np
 
 from .ui.MainWindow import Ui_MainWindow
 from .etc import noise_xerius2, PerlinNoiseFactory
+if TYPE_CHECKING:
+    from .world import GridWorld
 
 
 class PygameWidget(QtWidgets.QWidget):
@@ -35,13 +37,15 @@ class PygameWidget(QtWidgets.QWidget):
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, surface: pygame.Surface, parent=None):
+    def __init__(self, world: GridWorld, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.surface: pygame.Surface = surface
+        self.world = world
 
-        self.pygame_w = PygameWidget(surface, self.pygame_container)
-        self.pygame_container.setMinimumSize(surface.get_width(), surface.get_height())
+        self.surface: pygame.Surface = world.surface
+
+        self.pygame_w = PygameWidget(self.surface, self.pygame_container)
+        self.pygame_container.setMinimumSize(self.surface.get_width(), self.surface.get_height())
 
         self.setWindowTitle("Main")
 
@@ -51,22 +55,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.fresh_timer.timeout.connect(self.fresh)
         self.fresh_timer.start()
 
-        pnf = PerlinNoiseFactory(2, 4, (349, 362))
-
-        self.t = np.empty([self.surface.get_width(), self.surface.get_height(), 3])
-        for x in range(self.surface.get_width()):
-            for y in range(self.surface.get_height()):
-                pn = int((pnf(x * 0.01, y * 0.01) + 1) / 2 * 255 + 0.5)
-                self.t[x, y, 0] = pn
-                self.t[x, y, 1] = pn
-                self.t[x, y, 2] = pn
-        self.t.astype(int)
+        for i in range(self.world.gridCount[0]):
+            for j in range(self.world.gridCount[1]):
+                if (i + j) % 2 == 0:
+                    self.world.gridProperty[i][j] = True
+                else:
+                    self.world.gridProperty[i][j] = False
 
     def fresh(self):
         self.draw()
         self.pygame_w.fresh()
 
     def draw(self):
-        self.surface = pygame.surfarray.make_surface(self.t)
-        self.pygame_w.surface = self.surface
+        self.world.draw_grid()
+        for i, row in enumerate(self.world.gridProperty):
+            for j, cell in enumerate(row):
+                if cell:
+                    self.world.fill_cell(i, j, (100, 100, 100))
+        # self.surface = pygame.surfarray.make_surface(self.t)
+        # self.pygame_w.surface = self.surface
         # self.surface.fill((pn, pn, pn), (x, y, 1, 1))

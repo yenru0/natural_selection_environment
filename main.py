@@ -8,11 +8,12 @@ from function.entity import AbstractEntity
 from function.gene import Gene
 from function.species import Species
 from function.gui import MainWindow
+from function.world import World, GridWorld
 
 if __name__ == '__main__':
     pygame.init()
-    surf = pygame.Surface((640, 480))
+    gw = GridWorld(gridcellSize = (32, 32), gridCount=(20, 15))
     app = QApplication(sys.argv)
-    w = MainWindow(surf)
-    w.show()
+    win = MainWindow(gw)
+    win.show()
     app.exec_()
