@@ -4,8 +4,10 @@ import random
 
 from PySide2 import QtGui, QtWidgets, QtCore
 import pygame
+import numpy as np
 
 from .ui.MainWindow import Ui_MainWindow
+from .etc import noise_xerius2, PerlinNoiseFactory
 
 
 class PygameWidget(QtWidgets.QWidget):
@@ -36,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, surface: pygame.Surface, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.surface = surface
+        self.surface: pygame.Surface = surface
 
         self.pygame_w = PygameWidget(surface, self.pygame_container)
         self.pygame_container.setMinimumSize(surface.get_width(), surface.get_height())
@@ -44,23 +46,27 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Main")
 
         self.fresh_timer = QtCore.QTimer()
-        self.fresh_timer.setInterval(1000 / 60)
+        self.frame_number = 0
+        self.fresh_timer.setInterval(1000 / 1)
         self.fresh_timer.timeout.connect(self.fresh)
         self.fresh_timer.start()
 
-        self.test_poss = [[random.randint(100, 400), random.randint(100, 400)] for _ in range(10)]
+        pnf = PerlinNoiseFactory(2, 4, (349, 362))
 
-        self.btn.clicked.connect(self.btn_c)
-
+        self.t = np.empty([self.surface.get_width(), self.surface.get_height(), 3])
+        for x in range(self.surface.get_width()):
+            for y in range(self.surface.get_height()):
+                pn = int((pnf(x * 0.01, y * 0.01) + 1) / 2 * 255 + 0.5)
+                self.t[x, y, 0] = pn
+                self.t[x, y, 1] = pn
+                self.t[x, y, 2] = pn
+        self.t.astype(int)
 
     def fresh(self):
         self.draw()
         self.pygame_w.fresh()
 
     def draw(self):
-        self.surface.fill((64, 128, 192, 224))
-
-        for pos in self.test_poss:
-            pos[0] += random.randint(-2, 2)
-            pos[1] += random.randint(-2, 2)
-            pygame.draw.circle(self.surface, (255, 255, 255, 255), pos, 10)
+        self.surface = pygame.surfarray.make_surface(self.t)
+        self.pygame_w.surface = self.surface
+        # self.surface.fill((pn, pn, pn), (x, y, 1, 1))
