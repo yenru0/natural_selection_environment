@@ -1,8 +1,8 @@
-import numpy as np
 import math
 from itertools import product
-import math
 import random
+
+import numpy as np
 
 
 def lerp(p0, p1, t):
@@ -168,17 +168,22 @@ def noise_xerius2(x, y, seed=0):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    domain = np.linspace(0, 4, 100000)
+    domain = range(500)
 
-    plt.xlim((0, 0.5))
-    plt.ylim((-1, 1))
+    x, y = [112.2, 100]
 
-    pnf = PerlinNoiseFactory(1, 16, tile=(0.25,))
-    plt.vlines(1, -1, 1)
-    plt.vlines(2, -1, 1)
-    plt.vlines(3, -1, 1)
-    pnoise = np.vectorize(pnf)
-
-    plt.plot(domain, pnoise(domain))
-    # plt.plot(domain)
+    pnf1 = PerlinNoiseFactory(2, 8)
+    pnf2 = PerlinNoiseFactory(2, 8)
+    t = 0.0001
+    Tx = []
+    Ty = []
+    for i in domain:
+        mx, my = (pnf1(x, y), pnf2(y, x))
+        t += 0.001
+        x, y = mx * 3 + np.sign(mx) / 10 + x, my * 3 + np.sign(my) / 5 + y
+        Tx.append(mx * 3 + np.sign(mx) / 10)
+        Ty.append(my * 3 + np.sign(mx) / 10)
+    plt.plot(domain, Tx, 'r')
+    plt.plot(domain, Ty, 'b')
     plt.show()
+

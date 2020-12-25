@@ -8,8 +8,9 @@ import numpy as np
 
 from .ui.MainWindow import Ui_MainWindow
 from .etc import noise_xerius2, PerlinNoiseFactory
-if TYPE_CHECKING:
-    from .world import GridWorld
+from .entity import Baduk
+from .world import GridWorld
+from .gui_instance import Resistance, RandomWalk
 
 
 class PygameWidget(QtWidgets.QWidget):
@@ -35,43 +36,78 @@ class PygameWidget(QtWidgets.QWidget):
         self.image: QtGui.QImage = QtGui.QImage(self.data, w, h, QtGui.QImage.Format_RGB32)
         self.update()
 
+    def setSurface(self, surface: pygame.Surface):
+        self.surface = surface
+
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    def __init__(self, world: GridWorld, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.world = world
-
-        self.surface: pygame.Surface = world.surface
-
-        self.pygame_w = PygameWidget(self.surface, self.pygame_container)
-        self.pygame_container.setMinimumSize(self.surface.get_width(), self.surface.get_height())
-
         self.setWindowTitle("Main")
 
-        self.fresh_timer = QtCore.QTimer()
-        self.frame_number = 0
-        self.fresh_timer.setInterval(1000 / 1)
-        self.fresh_timer.timeout.connect(self.fresh)
-        self.fresh_timer.start()
+        self.comboList = [Resistance(self), RandomWalk(self)]
+        self.comboBox.addItems(["resistance", "random_walk"])
+        self.comboBox.currentIndexChanged.connect(self.combo_change)
+        # self.comboBox.currentTextChanged.connect(self.combo_change)
+        self.comboNow = self.comboList[0]
 
-        for i in range(self.world.gridCount[0]):
-            for j in range(self.world.gridCount[1]):
-                if (i + j) % 2 == 0:
-                    self.world.gridProperty[i][j] = True
-                else:
-                    self.world.gridProperty[i][j] = False
+        # for dynamic world to use update cycle
+        self.fresh_timer = QtCore.QTimer()
+        self.fps = 60
+        self.frame_number = 0
+        self.fresh_timer.setInterval(int(1000 / self.fps))
+        self.fresh_timer.timeout.connect(self.fresh)
+
+        self.btn_world_start.clicked.connect(self.start_world)
+        self.btn_world_stop.clicked.connect(self.stop_world)
+
+        self.btn_spawn.clicked.connect(self.make_spawn)
+
+        self.btn_confirm.clicked.connect(self.init_world)
+        self.world: GridWorld = GridWorld((1, 1), (1, 1))
+
+        self.surface: pygame.Surface = self.world.surface
+
+        self.pygame_w = PygameWidget(self.surface, self.pygame_container)
+
+        self.init_world()
 
     def fresh(self):
+        self.comboNow.fresh()
         self.draw()
-        self.pygame_w.fresh()
 
     def draw(self):
-        self.world.draw_grid()
-        for i, row in enumerate(self.world.gridProperty):
-            for j, cell in enumerate(row):
-                if cell:
-                    self.world.fill_cell(i, j, (100, 100, 100))
-        # self.surface = pygame.surfarray.make_surface(self.t)
-        # self.pygame_w.surface = self.surface
-        # self.surface.fill((pn, pn, pn), (x, y, 1, 1))
+        self.comboNow.draw()
+        self.pygame_w.fresh()
+
+    def init_world(self):
+        self.fresh_timer.stop()
+        self.frame_number = 0
+
+        self.world = self.comboNow.make_world((self.spbox_wg_csX.value(), self.spbox_wg_csY.value()),
+                                              (self.spbox_wg_gcX.value(), self.spbox_wg_gcY.value()))
+
+        self.comboNow.init_world()
+        self.view_progression.setText(str(self.frame_number))
+        self.view_entities.setText(str(len(self.world.entities)))
+
+        self.surface = self.world.surface
+        self.pygame_w.setSurface(self.surface)
+        self.pygame_container.setMinimumSize(self.surface.get_width(), self.surface.get_height())
+
+        self.draw()
+
+    def make_spawn(self):
+        self.comboNow.make_spawn()
+
+    def combo_change(self, i):
+        self.comboNow = self.comboList[i]
+        print(i)
+        self.init_world()
+
+    def start_world(self):
+        self.comboNow.start_world()
+
+    def stop_world(self):
+        self.comboNow.stop_world()

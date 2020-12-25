@@ -12,8 +12,7 @@ from function.world import World, GridWorld
 
 if __name__ == '__main__':
     pygame.init()
-    gw = GridWorld(gridcellSize = (32, 32), gridCount=(20, 15))
     app = QApplication(sys.argv)
-    win = MainWindow(gw)
+    win = MainWindow()
     win.show()
     app.exec_()
