@@ -9,20 +9,6 @@ if TYPE_CHECKING:
     from .entity import AbstractEntity
 
 
-class World:
-    """
-    자유 월드
-    """
-
-    def __init__(self, size: Tuple[int, int]):
-        self.size = size
-        self.surface: pygame.Surface = pygame.Surface(self.size)
-        self.entities: List[AbstractEntity] = list()
-
-    def push_entity(self, entity: AbstractEntity):
-        self.entities.append(entity)
-
-
 class GridWorld:
     """
     그리드 월드
@@ -134,6 +120,20 @@ class GridWorld:
         진보를 일으키고 후처리 정의
         """
         pass
+
+
+class FloatWorld(GridWorld):
+    def __init__(self, gridcellSize: Tuple[int, int], gridCount: Tuple[int, int]):
+        super().__init__((gridcellSize[0] * gridCount[0], gridcellSize[1] * gridCount[1]), (1, 1))
+
+    def draw(self):
+        self.fill_cell(0, 0, (255, 255, 255))
+        for e in self.entities:
+            e.draw()
+
+    def update(self):
+        for e in self.entities:
+            e.update()
 
 
 class BadukWorld(GridWorld):

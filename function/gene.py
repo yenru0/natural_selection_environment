@@ -6,7 +6,7 @@ class Gene:
     """
     Gene
 
-    26*2개의 유전자형을 가지며 각각은 알파벳 대소문자
+    genotype은 유전자 리스트
     """
 
     def __init__(self, length: int, identifier: str,

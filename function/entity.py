@@ -2,7 +2,7 @@ import random
 
 import numpy as np
 
-from .body import AbstractBody, BadukBody
+from .body import AbstractBody, BadukBody, CircleBody
 from .gene import Gene
 from .etc import PerlinNoiseFactory
 
@@ -34,6 +34,20 @@ class AbstractEntity:
 
     def aging(self):
         self.age += 1
+
+
+class RandomMover(AbstractEntity):
+    def __init__(self, world):
+        super().__init__(world, "RW")
+        self.body = CircleBody(self)
+        self.body.position = [self.world.size[0] / 2, self.world.size[1] / 2]
+
+    def update(self):
+        self.body.position = [self.body.position[0] + random.randint(-1, 1),
+                              self.body.position[1] + random.randint(-1, 1)]
+
+    def copy(self) -> 'RandomMover':
+        return RandomMover(self.world)
 
 
 class Baduk(AbstractEntity):

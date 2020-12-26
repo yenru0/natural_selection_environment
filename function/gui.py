@@ -51,6 +51,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.comboBox.currentIndexChanged.connect(self.combo_change)
         # self.comboBox.currentTextChanged.connect(self.combo_change)
         self.comboNow = self.comboList[0]
+        self.ledit_args.setText(self.comboNow.default_args)
 
         # for dynamic world to use update cycle
         self.fresh_timer = QtCore.QTimer()
@@ -84,7 +85,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def init_world(self):
         self.fresh_timer.stop()
         self.frame_number = 0
+        self.textli.clear()
 
+        self.comboNow.make_panel()
         self.world = self.comboNow.make_world((self.spbox_wg_csX.value(), self.spbox_wg_csY.value()),
                                               (self.spbox_wg_gcX.value(), self.spbox_wg_gcY.value()))
 
@@ -103,7 +106,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def combo_change(self, i):
         self.comboNow = self.comboList[i]
-        print(i)
+        self.ledit_args.setText(self.comboNow.default_args)
+
         self.init_world()
 
     def start_world(self):
@@ -111,3 +115,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def stop_world(self):
         self.comboNow.stop_world()
+
+    def delete_panel(self):
+        for i in range(self.scrollAreaWidgetContents.layout().count()):
+            self.scrollAreaWidgetContents.layout().itemAt(i).widget().setParent(None)

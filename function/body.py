@@ -21,6 +21,11 @@ class AbstractBody:
         pass
 
 
+class CircleBody(AbstractBody):
+    def draw(self):
+        pygame.draw.circle(self.entity.world.surface, (255, 0, 0), (int(self.position[0]), int(self.position[1])), 5)
+
+
 class BadukBody(AbstractBody):
     def draw(self):
         if self.entity.gene.genotype[0] == 0:

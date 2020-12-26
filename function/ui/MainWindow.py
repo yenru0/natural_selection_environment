@@ -126,18 +126,6 @@ class Ui_MainWindow(object):
 
         self.formLayout.setLayout(0, QFormLayout.FieldRole, self.layout_wg)
 
-        self.lbl_initspawn = QLabel(self.form_w)
-        self.lbl_initspawn.setObjectName(u"lbl_initspawn")
-
-        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.lbl_initspawn)
-
-        self.spbox_initspawn = QSpinBox(self.form_w)
-        self.spbox_initspawn.setObjectName(u"spbox_initspawn")
-        self.spbox_initspawn.setMaximum(16384)
-        self.spbox_initspawn.setValue(10)
-
-        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.spbox_initspawn)
-
         self.layout_w_confirm = QHBoxLayout()
         self.layout_w_confirm.setObjectName(u"layout_w_confirm")
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -150,22 +138,32 @@ class Ui_MainWindow(object):
         self.layout_w_confirm.addWidget(self.btn_confirm)
 
 
-        self.formLayout.setLayout(2, QFormLayout.FieldRole, self.layout_w_confirm)
+        self.formLayout.setLayout(5, QFormLayout.FieldRole, self.layout_w_confirm)
+
+        self.lbl_initspawn = QLabel(self.form_w)
+        self.lbl_initspawn.setObjectName(u"lbl_initspawn")
+
+        self.formLayout.setWidget(2, QFormLayout.LabelRole, self.lbl_initspawn)
+
+        self.lbl_args = QLabel(self.form_w)
+        self.lbl_args.setObjectName(u"lbl_args")
+
+        self.formLayout.setWidget(4, QFormLayout.LabelRole, self.lbl_args)
+
+        self.ledit_args = QLineEdit(self.form_w)
+        self.ledit_args.setObjectName(u"ledit_args")
+
+        self.formLayout.setWidget(4, QFormLayout.FieldRole, self.ledit_args)
+
+        self.spbox_initspawn = QSpinBox(self.form_w)
+        self.spbox_initspawn.setObjectName(u"spbox_initspawn")
+        self.spbox_initspawn.setMaximum(16384)
+        self.spbox_initspawn.setValue(10)
+
+        self.formLayout.setWidget(2, QFormLayout.FieldRole, self.spbox_initspawn)
 
 
         self.verticalLayout_2.addWidget(self.form_w)
-
-        self.line = QFrame(self.scrollAreaWidgetContents)
-        self.line.setObjectName(u"line")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.line.sizePolicy().hasHeightForWidth())
-        self.line.setSizePolicy(sizePolicy2)
-        self.line.setFrameShape(QFrame.HLine)
-        self.line.setFrameShadow(QFrame.Sunken)
-
-        self.verticalLayout_2.addWidget(self.line)
 
         self.form_c = QWidget(self.scrollAreaWidgetContents)
         self.form_c.setObjectName(u"form_c")
@@ -232,12 +230,14 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.form_c)
 
-        self.line_2 = QFrame(self.scrollAreaWidgetContents)
-        self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShape(QFrame.HLine)
-        self.line_2.setFrameShadow(QFrame.Sunken)
+        self.textli = QTextBrowser(self.scrollAreaWidgetContents)
+        self.textli.setObjectName(u"textli")
+        font = QFont()
+        font.setFamily(u"Malgun Gothic")
+        font.setPointSize(11)
+        self.textli.setFont(font)
 
-        self.verticalLayout_2.addWidget(self.line_2)
+        self.verticalLayout_2.addWidget(self.textli)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -267,8 +267,9 @@ class Ui_MainWindow(object):
         self.lbl_wg_csX.setText(QCoreApplication.translate("MainWindow", u"cell size X", None))
         self.lbl_wg_csY.setText(QCoreApplication.translate("MainWindow", u"cell size Y", None))
         self.lbl_wg_gcY.setText(QCoreApplication.translate("MainWindow", u"grid count Y", None))
-        self.lbl_initspawn.setText(QCoreApplication.translate("MainWindow", u"initial spawns", None))
         self.btn_confirm.setText(QCoreApplication.translate("MainWindow", u"confirm", None))
+        self.lbl_initspawn.setText(QCoreApplication.translate("MainWindow", u"initial spawns", None))
+        self.lbl_args.setText(QCoreApplication.translate("MainWindow", u"args", None))
         self.lbl_world.setText(QCoreApplication.translate("MainWindow", u"control", None))
         self.btn_world_start.setText(QCoreApplication.translate("MainWindow", u"start age", None))
         self.btn_world_stop.setText(QCoreApplication.translate("MainWindow", u"stop age", None))

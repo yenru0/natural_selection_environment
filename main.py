@@ -8,7 +8,7 @@ from function.entity import AbstractEntity
 from function.gene import Gene
 from function.species import Species
 from function.gui import MainWindow
-from function.world import World, GridWorld
+from function.world import GridWorld
 
 if __name__ == '__main__':
     pygame.init()
