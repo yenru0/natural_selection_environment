@@ -165,6 +165,7 @@ def noise_xerius2(x, y, seed=0):
     return np.random.uniform(0, 1)
 
 
+# test
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
@@ -186,4 +187,3 @@ if __name__ == '__main__':
     plt.plot(domain, Tx, 'r')
     plt.plot(domain, Ty, 'b')
     plt.show()
-

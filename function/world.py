@@ -1,12 +1,14 @@
 from __future__ import annotations
-from typing import Tuple, List, Any, Callable, TYPE_CHECKING
-from collections import Counter
-import random
 
+import random
+from typing import Tuple, List, Any, Callable, TYPE_CHECKING
+
+import numpy as np
 import pygame
 
 if TYPE_CHECKING:
     from .entity import AbstractEntity
+from .gene import GeneUtility
 
 
 class GridWorld:
@@ -22,7 +24,6 @@ class GridWorld:
         self.entities: List[AbstractEntity] = list()
 
         self.gridProperty: List[List[Any]] = [[None] * gridCount[1] for _ in range(gridCount[0])]
-        self.font = pygame.font.SysFont("NanumGothic", 16)
         self.gen = 0
 
     def push_entity(self, entity: AbstractEntity):
@@ -78,6 +79,8 @@ class GridWorld:
                            self.gridcellSize[0] - 1, self.gridcellSize[1] - 1)
                           )
 
+    # after this you implemented
+
     def update(self):
         """
         프레임이 한번 움직일 동안 진행될 행동을 정의
@@ -121,11 +124,21 @@ class GridWorld:
         """
         pass
 
+    def fitness(self, e) -> float:
+        """
+        엔티티의 적합도를 반환합니다.
+        :param e: 적합도를 구할 엔티티
+        :return: fitness
+        """
+        pass
 
-class FloatWorld(GridWorld):
+
+class FreeWorld(GridWorld):
     def __init__(self, gridcellSize: Tuple[int, int], gridCount: Tuple[int, int]):
         super().__init__((gridcellSize[0] * gridCount[0], gridcellSize[1] * gridCount[1]), (1, 1))
 
+
+class FloatWorld(FreeWorld):
     def draw(self):
         self.fill_cell(0, 0, (255, 255, 255))
         for e in self.entities:
@@ -164,3 +177,64 @@ class BadukWorld(GridWorld):
     def make_post_progress(self):
         for e in self.entities:
             e.body.position = [random.randrange(0, self.size[0]), random.randrange(0, self.size[1])]
+
+
+class TendencyWorld(FreeWorld):
+    def __init__(self, gridcellSize: Tuple[int, int], gridCount: Tuple[int, int]):
+        super().__init__(gridcellSize, gridCount)
+        self.destination: Tuple[float, float] = (0, 0)
+        self.spawnpoint: Tuple[float, float] = (0, 0)
+        self.gene_length: int = 200
+        self.frame: int = 0
+        self.fitness_pool: list = []
+
+    def draw(self):
+        self.fill_cell(0, 0, (255, 255, 255))
+        pygame.draw.circle(self.surface, (30, 30, 170), (int(self.destination[0]), int(self.destination[1])), 10)
+        for e in self.entities:
+            e.draw()
+
+    def update(self):
+        for e in self.entities:
+            e.update()
+        self.frame += 1
+
+    def make_progress(self):
+        gene_pool = []
+        self.fitness_pool = []
+
+        count = len(self.entities)
+        for e in self.entities[:]:
+            g, f = e.gene, self.fitness(e)
+            if f == 0:
+                f = 0.000000000000000000000000000001
+            gene_pool.append(g)
+            self.fitness_pool.append(f)
+        sum_of_fitness = sum(self.fitness_pool)
+
+        def choice() -> int:
+            p = np.random.uniform(0, sum_of_fitness)
+            t = 0
+            for i in range(0, count):
+                t += self.fitness_pool[i]
+                if p < t:
+                    return i
+
+        for i in range(count):
+            _a = gene_pool[choice()]
+            _b = gene_pool[choice()]
+            _n = GeneUtility.mutate(GeneUtility.crossover_half(_a, _b),
+                                    lambda: (random.uniform(-3, 3), random.uniform(-3, 3))
+                                    )
+            self.entities[i].gene = _n
+
+        self.gen += 1
+
+    def make_post_progress(self):
+        self.frame = 0
+        for e in self.entities:
+            e.body.position = list(self.spawnpoint)
+
+    def fitness(self, e: AbstractEntity) -> float:
+        return 1 / np.sqrt(
+            ((self.destination[0] - e.body.position[0]) ** 2 + (self.destination[1] - e.body.position[1]) ** 2))

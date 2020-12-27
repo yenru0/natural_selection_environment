@@ -10,7 +10,7 @@ from .ui.MainWindow import Ui_MainWindow
 from .etc import noise_xerius2, PerlinNoiseFactory
 from .entity import Baduk
 from .world import GridWorld
-from .gui_instance import Resistance, RandomWalk
+from .gui_instance import Resistance, RandomWalk, Tendency
 
 
 class PygameWidget(QtWidgets.QWidget):
@@ -46,8 +46,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("Main")
 
-        self.comboList = [Resistance(self), RandomWalk(self)]
-        self.comboBox.addItems(["resistance", "random_walk"])
+        self.comboList = [Resistance(self), RandomWalk(self), Tendency(self)]
+        self.comboBox.addItems(["resistance", "random_walk", "tendency"])
         self.comboBox.currentIndexChanged.connect(self.combo_change)
         # self.comboBox.currentTextChanged.connect(self.combo_change)
         self.comboNow = self.comboList[0]

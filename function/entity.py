@@ -65,3 +65,28 @@ class Baduk(AbstractEntity):
 
     def copy(self) -> 'Baduk':
         return Baduk(self.world, gene=self.gene.clone())
+
+
+class Mover(AbstractEntity):
+    def __init__(self, world, gene=None, ):
+        super().__init__(world, "MOVER")
+        self.body = CircleBody(self)
+        self.body.position = [self.world.spawnpoint[0], self.world.spawnpoint[1]]
+        if gene is not None:
+            if gene.identifier == self.identifier:
+                self.gene = gene.clone()
+            else:
+                raise Exception("wrong identi")
+        else:
+            self.gene = Gene(world.gene_length, identifier=self.identifier,
+                             genotype=[(random.uniform(-3, 3), random.uniform(-3, 3)) for _ in range(world.gene_length)]
+                             )
+
+    def update(self):
+        t = self.gene.genotype[self.world.frame]
+        self.body.position = [self.body.position[0] + t[0],
+                              self.body.position[1] + t[1]
+                              ]
+
+    def copy(self) -> 'Mover':
+        return Mover(self.world, gene=self.gene.clone())

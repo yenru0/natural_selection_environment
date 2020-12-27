@@ -1,2 +1,4 @@
 PySide2~=5.14.2.1
 pygame~=1.9.6
+numpy~=1.18.1
+matplotlib~=3.2.1 # for test

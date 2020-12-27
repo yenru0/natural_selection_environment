@@ -1,6 +1,7 @@
 import random
 from typing import List, Union, Callable, Any
 
+import numpy as np
 
 class Gene:
     """
@@ -21,27 +22,6 @@ class Gene:
         else:
             self.genotype: List[Any] = [None] * length
 
-    def mutated(self, make: Callable[[], Any]):
-        for i in range(self.length):
-            if random.random() < self.mutation_rate:
-                self.genotype[i] = make()
-
-    @classmethod
-    def mutate(cls, a: 'Gene', make: Callable[[], Any]) -> 'Gene':
-        for i in range(a.length):
-            if random.random() < a.mutation_rate:
-                a.genotype[i] = make()
-        return a
-
-    @classmethod
-    def mate(cls, a: 'Gene', b: 'Gene') -> 'Gene':
-        if a.identifier != b.identifier and a.length == b.length:
-            raise Exception("do not match gene's identifier")
-        else:
-            return Gene(a.length, a.identifier,
-                        mutation_rate=a.mutation_rate,
-                        genotype=a.genotype[:int(a.length / 2)] + b.genotype[int(a.length / 2):])
-
     def clone(self):
         return Gene(self.length, self.identifier, mutation_rate=self.mutation_rate, genotype=self.genotype)
 
@@ -50,6 +30,25 @@ class Gene:
 
     def __repr__(self):
         return f"<GENE:{self.identifier}({self.length}):{self.genotype}({self.mutation_rate})>"
+
+
+class GeneUtility:
+    """
+    Gene과 관련된 여러가지 연산을 합니다.
+    """
+
+    @staticmethod
+    def crossover_half(a: Gene, b: Gene) -> Gene:
+        return Gene(a.length, a.identifier,
+                    mutation_rate=a.mutation_rate,
+                    genotype=a.genotype[:int(a.length / 2)] + b.genotype[int(a.length / 2):])
+
+    @staticmethod
+    def mutate(a: Gene, make: Callable[[], Any]) -> Gene:
+        for i in range(a.length):
+            if random.random() < a.mutation_rate:
+                a.genotype[i] = make()
+        return a
 
 
 # test
